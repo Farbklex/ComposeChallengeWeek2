@@ -17,20 +17,37 @@ package com.example.androiddevchallenge
 
 import android.os.Bundle
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.androiddevchallenge.ui.theme.MyTheme
 
 class MainActivity : AppCompatActivity() {
+
+    private val timerViewModel by viewModels<CountdownViewModel>()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             MyTheme {
-                MyApp()
+                TimerScreen(
+                    timerViewModel,
+                    { timerViewModel.onTimerChanged(it) },
+                    { timerViewModel.startClicked() }
+                )
             }
         }
     }
@@ -38,9 +55,45 @@ class MainActivity : AppCompatActivity() {
 
 // Start building your app here!
 @Composable
-fun MyApp() {
+fun TimerScreen(
+    timerViewModel: CountdownViewModel,
+    onTimeSet: (Int) -> Unit,
+    onStartClicked: () -> Unit
+) {
     Surface(color = MaterialTheme.colors.background) {
-        Text(text = "Ready... Set... GO!")
+        val time: Int by timerViewModel.timer.observeAsState(0)
+        TimerView(
+            time,
+            onTimeSet,
+            onStartClicked
+        )
+    }
+}
+
+@Composable
+fun TimerView(
+    time: Int,
+    onTimeSet: (Int) -> Unit,
+    onStartClicked: () -> Unit
+) {
+    Surface(color = MaterialTheme.colors.background) {
+        Column(modifier = Modifier.fillMaxHeight()) {
+            Text(text = "$time")
+            Button(onClick = { onStartClicked() }) {
+                Text(text = "Start")
+            }
+            Row(modifier = Modifier.fillMaxWidth()) {
+                Button(modifier = Modifier.wrapContentSize(), onClick = { onTimeSet(3) }) {
+                    Text(text = "🍵")
+                }
+                Button(modifier = Modifier.wrapContentSize(), onClick = { onTimeSet(4) }) {
+                    Text(text = "🍜")
+                }
+                Button(modifier = Modifier.wrapContentSize(), onClick = { onTimeSet(7) }) {
+                    Text(text = "🥚")
+                }
+            }
+        }
     }
 }
 
@@ -48,7 +101,7 @@ fun MyApp() {
 @Composable
 fun LightPreview() {
     MyTheme {
-        MyApp()
+        TimerView(1, {}, {})
     }
 }
 
@@ -56,6 +109,6 @@ fun LightPreview() {
 @Composable
 fun DarkPreview() {
     MyTheme(darkTheme = true) {
-        MyApp()
+        TimerView(1, {}, {})
     }
 }
