@@ -24,7 +24,8 @@ import androidx.lifecycle.ViewModel
 class CountdownViewModel : ViewModel() {
     private val _timer = MutableLiveData(0)
     private val _timerText = Transformations.map(_timer) { millisecondsToStringTime(it) }
-    private val _isRunning = MutableLiveData<Boolean>(false)
+    private val _isRunning = MutableLiveData(false)
+    private val _selectedTimer = MutableLiveData("")
 
     /**
      * The countdown time in minutes:seconds
@@ -32,8 +33,12 @@ class CountdownViewModel : ViewModel() {
     val timer: LiveData<String> = _timerText
     val showStartButton: LiveData<Boolean> = Transformations.map(_isRunning) { !it }
     val showStopButton: LiveData<Boolean> = Transformations.map(_isRunning) { it }
+    val rotation: LiveData<Float> = Transformations.map(_timer) { millisecondsToRotation(it) }
+    val selectedTimer: LiveData<String> = _selectedTimer
 
-    var countDownTimer: CountDownTimer? = null
+    var startTime: Long? = null
+
+    private var countDownTimer: CountDownTimer? = null
 
     private fun millisecondsToStringTime(milliseconds: Int): String {
         val seconds = milliseconds / 1000
@@ -41,20 +46,32 @@ class CountdownViewModel : ViewModel() {
         return "$minutes:${seconds - (minutes * 60)}"
     }
 
-    fun onTimerChanged(newTimer: Int) {
+    private fun millisecondsToRotation(currentTime: Int): Float {
+        startTime?.let {
+            val percentage: Float = currentTime.toFloat() / it.toFloat()
+            return 360 * percentage
+        }
+        return 0f
+    }
+
+    fun onTimerChanged(newTimer: Int, selectedTimer: String) {
+        startTime = newTimer.toLong()
         _timer.value = newTimer
+        _selectedTimer.value = selectedTimer
     }
 
     fun startClicked() {
         _timer.value?.let {
-            val startTime: Long = (it).toLong()
-            countDownTimer = object : CountDownTimer(startTime, 1000) {
+            val countDownStartTime = it.toLong()
+            countDownTimer = object : CountDownTimer(countDownStartTime, 1000) {
                 override fun onTick(millisUntilFinished: Long) {
                     _timer.value = millisUntilFinished.toInt()
                 }
 
                 override fun onFinish() {
                     _isRunning.value = false
+                    _selectedTimer.value = ""
+                    startTime = 0
                 }
             }.start()
             _isRunning.value = true
