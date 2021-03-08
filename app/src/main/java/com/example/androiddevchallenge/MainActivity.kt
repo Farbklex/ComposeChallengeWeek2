@@ -86,30 +86,50 @@ fun TimerView(
     onStopClicked: () -> Unit
 ) {
     Surface(color = MaterialTheme.colors.background) {
-        Column(modifier = Modifier.fillMaxHeight(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.SpaceEvenly) {
+        Column(
+            modifier = Modifier.fillMaxHeight(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.SpaceEvenly
+        ) {
             Text(text = time, style = MaterialTheme.typography.h2)
-            if(showStartButton){
+            if (showStartButton) {
                 Button(onClick = { onStartClicked() }) {
                     Text(text = "Start")
                 }
             }
 
-            if(showStopButton){
+            if (showStopButton) {
                 Button(onClick = { onStopClicked() }) {
                     Text(text = "Stop")
                 }
             }
 
-            Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceEvenly) {
-                Button(modifier = Modifier.wrapContentSize(), onClick = { onTimeSet(3 * 60 * 1000) }, enabled = showStartButton) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                Button(
+                    modifier = Modifier.wrapContentSize(),
+                    onClick = { onTimeSet(3 * 60 * 1000) },
+                    enabled = showStartButton
+                ) {
                     Text(text = "🍵", fontSize = 36.sp)
                 }
 
-                Button(modifier = Modifier.wrapContentSize(), onClick = { onTimeSet(4 * 60 * 1000) }, enabled = showStartButton) {
+                Button(
+                    modifier = Modifier.wrapContentSize(),
+                    onClick = { onTimeSet(4 * 60 * 1000) },
+                    enabled = showStartButton
+                ) {
                     Text(text = "🍜", fontSize = 36.sp)
                 }
 
-                Button(modifier = Modifier.wrapContentSize(), onClick = { onTimeSet(7 * 60 * 1000) }, enabled = showStartButton) {
+                Button(
+                    modifier = Modifier.wrapContentSize(),
+                    onClick = { onTimeSet(7 * 60 * 1000) },
+                    enabled = showStartButton
+                ) {
                     Text(text = "🥚", fontSize = 36.sp)
                 }
             }

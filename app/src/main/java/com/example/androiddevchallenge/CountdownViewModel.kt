@@ -23,7 +23,7 @@ import androidx.lifecycle.ViewModel
 
 class CountdownViewModel : ViewModel() {
     private val _timer = MutableLiveData(0)
-    private val _timerText = Transformations.map(_timer){ millisecondsToStringTime(it)}
+    private val _timerText = Transformations.map(_timer) { millisecondsToStringTime(it) }
     private val _isRunning = MutableLiveData<Boolean>(false)
 
     /**
@@ -38,7 +38,7 @@ class CountdownViewModel : ViewModel() {
     private fun millisecondsToStringTime(milliseconds: Int): String {
         val seconds = milliseconds / 1000
         val minutes = seconds / 60
-        return "$minutes:${seconds-(minutes*60)}"
+        return "$minutes:${seconds - (minutes * 60)}"
     }
 
     fun onTimerChanged(newTimer: Int) {
