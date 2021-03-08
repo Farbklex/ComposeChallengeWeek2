@@ -18,11 +18,28 @@ package com.example.androiddevchallenge
 import android.os.CountDownTimer
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 
 class CountdownViewModel : ViewModel() {
     private val _timer = MutableLiveData(0)
-    val timer: LiveData<Int> = _timer
+    private val _timerText = Transformations.map(_timer){ millisecondsToStringTime(it)}
+    private val _isRunning = MutableLiveData<Boolean>(false)
+
+    /**
+     * The countdown time in minutes:seconds
+     */
+    val timer: LiveData<String> = _timerText
+    val showStartButton: LiveData<Boolean> = Transformations.map(_isRunning) { !it }
+    val showStopButton: LiveData<Boolean> = Transformations.map(_isRunning) { it }
+
+    var countDownTimer: CountDownTimer? = null
+
+    private fun millisecondsToStringTime(milliseconds: Int): String {
+        val seconds = milliseconds / 1000
+        val minutes = seconds / 60
+        return "$minutes:${seconds-(minutes*60)}"
+    }
 
     fun onTimerChanged(newTimer: Int) {
         _timer.value = newTimer
@@ -30,15 +47,24 @@ class CountdownViewModel : ViewModel() {
 
     fun startClicked() {
         _timer.value?.let {
-            val startTime: Long = (it * 60 * 1000).toLong()
-            val countDowntimer = object : CountDownTimer(startTime, 1000) {
+            val startTime: Long = (it).toLong()
+            countDownTimer = object : CountDownTimer(startTime, 1000) {
                 override fun onTick(millisUntilFinished: Long) {
-                    _timer.value = (millisUntilFinished / 1000).toInt()
+                    _timer.value = millisUntilFinished.toInt()
                 }
 
                 override fun onFinish() {
+                    _isRunning.value = false
                 }
             }.start()
+            _isRunning.value = true
+        }
+    }
+
+    fun stopClicked() {
+        countDownTimer?.let {
+            it.cancel()
+            _isRunning.value = false
         }
     }
 }
